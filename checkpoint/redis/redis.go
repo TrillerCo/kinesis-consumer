@@ -1,10 +1,11 @@
 package redis
 
 import (
+	"strings"
 	"fmt"
 	"os"
 
-	redis "gopkg.in/redis.v5"
+	"github.com/go-redis/redis"
 )
 
 const localhost = "127.0.0.1:6379"
@@ -16,7 +17,11 @@ func New(appName string) (*Checkpoint, error) {
 		addr = localhost
 	}
 
-	client := redis.NewClient(&redis.Options{Addr: addr})
+	// When using with Redis Cluster, set REDIS_URL
+	// to a comma seperated list of URLS
+	addrs := strings.Split(addr, ",") 
+
+	client := redis.NewUniversalClient(&redis.UniversalOptions{Addrs: addrs})
 
 	// verify we can ping server
 	_, err := client.Ping().Result()
@@ -33,7 +38,7 @@ func New(appName string) (*Checkpoint, error) {
 // Checkpoint stores and retreives the last evaluated key from a DDB scan
 type Checkpoint struct {
 	appName string
-	client  *redis.Client
+	client  redis.UniversalClient
 }
 
 // Get fetches the checkpoint for a particular Shard.
