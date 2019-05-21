@@ -1,4 +1,4 @@
-module github.com/harlow/kinesis-consumer
+module github.com/TrillerCo/kinesis-consumer
 
 require (
 	github.com/apex/log v1.0.0
